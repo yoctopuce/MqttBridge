@@ -1,0 +1,10 @@
+[Unit]
+Description=Yoctopuce MqttBridge
+After=network.target
+
+[Service]
+ExecStart=/usr/sbin/MqttBridge -c /etc/mqttbridge.conf
+Type=simple
+
+[Install]
+WantedBy=multi-user.target

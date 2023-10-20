@@ -1,0 +1,112 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          MqttBridge
+# Required-Start:    networking
+# Required-Stop:     networking
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start/stop Yoctopuce MqttBridge
+# Description:       Start/stop Yoctopuce MqttBridge
+#                    more info can be found on www.yoctopuce.com
+### END INIT INFO
+
+###################################################################
+## EDIT THIS SECTION WITH YOUR SPECIFIC PARAMETERS
+# MQTTBRIDGE_BIN : where is the actual executable
+MQTTBRIDGE_BIN=/usr/sbin/MqttBridge
+#
+# MQTTBRIDGE_LOGFILE: if set MqttBridge will save the log into
+#                     into this file
+MQTTBRIDGE_LOGFILE=/var/log/mqttbridge.log
+#
+# MQTTBRIDGE_SETTINGS: the file where the MqttBridge will load
+#                      its configuration
+MQTTBRIDGE_SETTINGS=/etc/mqttbridge.conf
+#
+# END OF EDIT SECTION
+##################################################################
+
+
+
+# Process name ( For display )
+NAME=MqttBridge
+# pid file for the MqttBridge
+PIDFILE=/var/run/mqttbridge.pid
+
+# Using the lsb functions to perform the operations.
+. /lib/lsb/init-functions
+# If the MqttBridge is not there, then exit.
+if [ ! -e $MQTTBRIDGE_BIN ]; then
+  echo "MqttBridge binary is invalid ($MQTTBRIDGE_BIN)"
+  exit 5
+fi
+
+if [ ! -x $MQTTBRIDGE_BIN ]; then
+  echo "MqttBridge binary has not the executable flag set"
+  exit 5
+fi
+
+case $1 in
+ start)
+  # Checked the PID file exists and check the actual status of process
+  if [ -e $PIDFILE ]; then
+   status_of_proc -p $PIDFILE $MQTTBRIDGE_BIN "$NAME process" && status="0" || status="$?"
+   # If the status is SUCCESS then don't need to start again.
+   if [ $status = "0" ]; then
+    exit # Exit
+   fi
+  fi
+
+  START_OPTION="-d"
+  if [ -n $MQTTBRIDGE_LOGFILE ];then
+    START_OPTION=$START_OPTION" -g "$MQTTBRIDGE_LOGFILE
+  fi
+
+  if [ -n $MQTTBRIDGE_SETTINGS ];then
+    START_OPTION=$START_OPTION" -c "$MQTTBRIDGE_SETTINGS
+  fi
+
+  # Start the daemon.
+  log_daemon_msg "Starting the process" "$NAME"
+  # Start the daemon with the help of start-stop-daemon
+  # Log the message appropriately
+  if start-stop-daemon --start --quiet --oknodo  --exec $MQTTBRIDGE_BIN -- $START_OPTION ; then
+   cat /dev/null >  $PIDFILE
+   pidof $MQTTBRIDGE_BIN >>  $PIDFILE
+   log_end_msg 0
+  else
+   log_end_msg 1
+  fi
+  ;;
+ stop)
+  # Stop the daemon.
+  if [ -e $PIDFILE ]; then
+   status_of_proc -p $PIDFILE $MQTTBRIDGE_BIN "Stoppping the $NAME process" && status="0" || status="$?"
+   if [ "$status" = 0 ]; then
+    start-stop-daemon --stop --quiet --oknodo --pidfile $PIDFILE
+    /bin/rm -rf $PIDFILE
+   fi
+  else
+   log_daemon_msg "$NAME process is not running"
+   log_end_msg 0
+  fi
+  ;;
+ restart)
+  # Restart the daemon.
+  $0 stop && sleep 2 && $0 start
+  ;;
+ status)
+  # Check the status of the process.
+  if [ -e $PIDFILE ]; then
+   status_of_proc -p $PIDFILE $MQTTBRIDGE_BIN "$NAME process" && exit 0 || exit $?
+  else
+   log_daemon_msg "$NAME Process is not running"
+   log_end_msg 0
+  fi
+  ;;
+ *)
+  # For invalid arguments, print the usage message.
+  echo "Usage: $0 {start|stop|restart|status}"
+  exit 2
+  ;;
+esac
