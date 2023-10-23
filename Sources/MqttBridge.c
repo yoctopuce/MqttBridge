@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: MqttBridge.c 57313 2023-10-20 09:00:00Z seb $
+ * $Id: MqttBridge.c 57349 2023-10-20 11:31:48Z mvuilleu $
  *
  * MqttBridge: entry point
  *
@@ -344,11 +344,11 @@ int ParseArguments(int argc, char *argv[])
         exit(1);
     }
     if (Globalp.mqtts_port) {
-        Globalp.mqttbroker_port = atoi(Globalp.mqtts_port);
+        Globalp.mqttbroker_port = (u16)atoi(Globalp.mqtts_port);
         Globalp.flags |= MQTT_USE_SSL;
     }
     else if (Globalp.mqtt_port) {
-        Globalp.mqttbroker_port = atoi(Globalp.mqtt_port);
+        Globalp.mqttbroker_port = (u16)atoi(Globalp.mqtt_port);
     }
     else {
         Globalp.mqttbroker_port = 1883;
@@ -431,13 +431,8 @@ static void LogFn(const char* msg, u32 len)
 static void DeviceArrivalFn(YAPI_DEVICE devdescr)
 {
     yDeviceSt infos;
-    yStrRef serialref;
-    int devydx;
 
     yapiGetDeviceInfo(devdescr, &infos, NULL);
-    serialref = yHashTestStr(infos.serial);
-    devydx = wpGetDevYdx(serialref);
-
     ylogf("Device connected: %s\n", infos.serial);
 
     // The very first arrival callback comes from the hub itself
@@ -524,7 +519,7 @@ void FunctionUpdateFn(YAPI_FUNCTION fundescr, const char* value)
     funydx = ypSearchByDevYdx((u8)devydx, funcId);
 
     //ylogf("Function update for %s.%s (devYdx=%d, funYdx=%d): %s\n", serialNumber, functionId, devydx, funydx, value);
-    mqtt_setFlag(devydx, funydx);
+    mqtt_setFlag((u16)devydx, (s16)funydx);
 }
 
 void TimedReportFn(YAPI_FUNCTION fundescr, double timestamp, const u8* data, u32 len, double duration)
@@ -549,19 +544,19 @@ void TimedReportFn(YAPI_FUNCTION fundescr, double timestamp, const u8* data, u32
     //ylogf("Timed reports for %s.%s (devYdx=%d, funYdx=%d)\n", serialNumber, functionId, devydx, funydx);
     if (len <= 5) {
         // immediate report
-        mqtt_push_not_item(devydx, funydx, 0, 0, data, len);
+        mqtt_push_not_item((u8)devydx, (u8)funydx, 0, 0, data, len);
     } else {
         // averaged report: avg,avg-min,max-avg
         s32 avgval;
         u8 detail = *data++;
         len = 1 + (detail & 3);
-        avgval = mqtt_push_not_item(devydx, funydx, 0, 0, data, len);
+        avgval = mqtt_push_not_item((u8)devydx, (u8)funydx, 0, 0, data, len);
         data += len;
         len = 1 + ((detail >> 2) & 3);
-        mqtt_push_not_item(devydx, funydx, 0x10, avgval, data, len);
+        mqtt_push_not_item((u8)devydx, (u8)funydx, 0x10, avgval, data, len);
         data += len;
         len = 1 + ((detail >> 4) & 3);
-        mqtt_push_not_item(devydx, funydx, 0x20, avgval, data, len);
+        mqtt_push_not_item((u8)devydx, (u8)funydx, 0x20, avgval, data, len);
     }
 }
 

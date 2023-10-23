@@ -1,3 +1,3 @@
-MqttBridge v1.10.57314
+MqttBridge v1.10.57386
 
 - First release

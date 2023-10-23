@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: request.c 57313 2023-10-20 09:00:00Z seb $
+ * $Id: request.c 57316 2023-10-20 09:48:17Z mvuilleu $
  *
  *  Helpers to make requests to Yoctopuce hosts using yapi from C
  *
@@ -104,7 +104,7 @@ yFarFifoBuf* yoctohubGetOutputFifo(void)
         int      replySize;
 
         char* request = calloc(1, requestSize + 1);
-        yPopFarFifo(&inputFifo, (u8 *)request, requestSize);
+        yPopFarFifo(&inputFifo, (u8 *)request, (u16)requestSize);
         rc = yapiHTTPRequestSyncStart(&iohdl, SerialNumberStr, request, &reply, &replySize, errMsgBuf);
         if (rc >= 0) {
             if (memcmp(reply, "HTTP/1", 6) == 0) {
@@ -123,13 +123,13 @@ yFarFifoBuf* yoctohubGetOutputFifo(void)
                         }
                     }
                     // drop header
-                    yPushFarFifo(&outputFifo, (u8*)reply+p, replySize-p);
+                    yPushFarFifo(&outputFifo, (u8*)reply+p, (u16)(replySize-p));
                 } else {
                     // request failed, keep full headers
-                    yPushFarFifo(&outputFifo, (u8*)reply, replySize);
+                    yPushFarFifo(&outputFifo, (u8*)reply, (u16)replySize);
                 }
             } else {
-                yPushFarFifo(&outputFifo, (u8*)reply, replySize);
+                yPushFarFifo(&outputFifo, (u8*)reply, (u16)replySize);
             }
             yapiHTTPRequestSyncDone(&iohdl, errMsgBuf);
         }

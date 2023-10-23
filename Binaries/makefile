@@ -135,7 +135,7 @@ STRIP_OSX = strip
 
 
 GLOBAL_OPT = -Wall $(DEF_SSL_GCC) -DMQTT_BRIDGE
-GLOBAL_OPT_WIN = /nologo $(DEF_SSL_WIN) /W3 /WX- /wd4710 /wd4711 /O2 /Oi /Oy- /GL $(DEF_FLAGS_WIN) /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "_USING_V110_SDK71_" /Gm- /EHsc /MT /GS /Gy /Zc:inline /fp:precise /Zc:wchar_t /Zc:forScope /analyze- /Gd
+GLOBAL_OPT_WIN = /nologo $(DEF_SSL_WIN) /W3 /WX- /wd4710 /wd4711 /wd5045 /wd4548 /wd4242 /O2 /Oi /Oy- /GL $(DEF_FLAGS_WIN) /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "_USING_V110_SDK71_" /Gm- /EHsc /MT /GS /Gy /Zc:inline /fp:precise /Zc:wchar_t /Zc:forScope /analyze- /Gd
 
 OPTS_WIN32 = $(DEF_FLAGS_WIN)
 OPTS_WIN64 = $(DEF_FLAGS_WIN)
