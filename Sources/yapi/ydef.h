@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: ydef.h 57313 2023-10-20 09:00:00Z seb $
+ * $Id: ydef.h 57574 2023-11-02 08:09:36Z seb $
  *
  * Standard definitions common to all yoctopuce projects
  *
@@ -1151,9 +1151,6 @@ typedef union {
 
 
 #define Y_IS_TEXAS(devid_family)    (devid_family != FAMILY_PIC24FJ256DA210 && devid_family != FAMILY_PIC24FJ64GB004)
-//fixme remove when no more needed
-#define DEBUG_TRACE()  ylogf("%s:%d\n",__FILENAME__,__LINE__)
-
 
 #if defined(MICROCHIP_API) || defined(FREERTOS_API) || defined(VIRTUAL_HUB)
 #define YAPI_IN_YDEVICE

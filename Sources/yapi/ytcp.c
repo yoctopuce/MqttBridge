@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * $Id: ytcp.c 57313 2023-10-20 09:00:00Z seb $
+ * $Id: ytcp.c 57635 2023-11-03 10:25:43Z seb $
  *
  * Implementation of a client TCP stack
  *
@@ -432,6 +432,7 @@ int yResolveDNS(const char *name, IPvX_ADDR *ip, char *errmsg)
 #endif
 
     memset(&hint, 0, sizeof(hint));
+    memset(&ipv6_res, 0, sizeof(ipv6_res));
     hint.ai_family = AF_UNSPEC; // AF_INET6;
 
     if (getaddrinfo(name, NULL, &hint, &infos) != 0) {
@@ -1341,7 +1342,7 @@ exit:
                     if (c == ':') {
                         int parse_val = 0;
                         p++;
-                        if (YSTRCMP(buffer, "Transfer-Encoding") == 0) {
+                        if (YSTRICMP(buffer, "Transfer-Encoding") == 0) {
                             parse_val = 1;
                         }
                         pt = buffer;

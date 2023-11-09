@@ -1,3 +1,4 @@
-MqttBridge v1.10.57386
+MqttBridge v1.10.57762
 
-- First release
+- Update license information to mention the use of Mbed TLS
+- Fix connection to HTTP server that use chunked encoding written in lower case
